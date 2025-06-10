@@ -23,7 +23,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -47,6 +46,7 @@ fun Home(navegacao: NavHostController?) {
     val context = LocalContext.current
     val eventosState = remember { mutableStateOf<List<Evento>>(emptyList()) }
     val eventosFiltrados = remember { mutableStateOf<List<Evento>>(emptyList()) }
+    var textoPesquisa by remember { mutableStateOf("") }
 
     var showCategoriaDialog by remember { mutableStateOf(false) }
     var showEstadoDialog by remember { mutableStateOf(false) }
@@ -59,18 +59,16 @@ fun Home(navegacao: NavHostController?) {
 
     fun aplicarFiltro() {
         eventosFiltrados.value = eventosState.value.filter { evento ->
-            val categoriaOk = categoriasSelecionadas.isEmpty() ||
-                    evento.categoria.any { cat ->
-                        categoriasSelecionadas.any { filtro -> filtro.equals(cat.categoria, ignoreCase = true) }
-                    }
-
-            val estadoOk = estadosSelecionados.isEmpty() ||
-                    estadosSelecionados.any { it.equals(evento.estado.estado, ignoreCase = true) }
-
-            categoriaOk && estadoOk
+            val pesquisaOk = textoPesquisa.isBlank() || evento.titulo.contains(textoPesquisa, ignoreCase = true)
+            val categoriaOk = categoriasSelecionadas.isEmpty() || evento.categoria.any { cat ->
+                categoriasSelecionadas.any { filtro -> filtro.equals(cat.categoria, ignoreCase = true) }
+            }
+            val estadoOk = estadosSelecionados.isEmpty() || estadosSelecionados.any {
+                it.equals(evento.estado.estado, ignoreCase = true)
+            }
+            pesquisaOk && categoriaOk && estadoOk
         }
     }
-
 
     fun carregarCategorias() {
         RetrofitFactory().getEventoService().listarCategorias()
@@ -89,7 +87,7 @@ fun Home(navegacao: NavHostController?) {
         RetrofitFactory().getEventoService().listarEstados()
             .enqueue(object : Callback<ResultEstado> {
                 override fun onResponse(call: Call<ResultEstado>, response: Response<ResultEstado>) {
-                    estados = response.body()?.estado ?: emptyList() // campo mal nomeado no JSON
+                    estados = response.body()?.estado ?: emptyList()
                     showEstadoDialog = true
                 }
                 override fun onFailure(call: Call<ResultEstado>, t: Throwable) {
@@ -135,19 +133,19 @@ fun Home(navegacao: NavHostController?) {
                     modifier = Modifier.size(90.dp)
                 )
 
-                Box(
+                OutlinedTextField(
+                    value = textoPesquisa,
+                    onValueChange = {
+                        textoPesquisa = it
+                        aplicarFiltro()
+                    },
                     modifier = Modifier
                         .weight(1f)
-                        .padding(horizontal = 8.dp)
-                        .background(Color(0xFFF0F0F0), RoundedCornerShape(20.dp))
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
-                ) {
-                    Text(
-                        text = "Pesquisar shows, eventos, teatros",
-                        fontSize = 12.sp,
-                        color = Color.Gray
-                    )
-                }
+                        .padding(start = 8.dp),
+                    placeholder = { Text("Pesquisar eventos...") },
+                    singleLine = true,
+                    shape = RoundedCornerShape(20.dp)
+                )
 
                 Button(
                     onClick = { navegacao?.navigate("perfil") },
@@ -157,7 +155,7 @@ fun Home(navegacao: NavHostController?) {
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.pe),
-                        contentDescription = "Botão com imagem"
+                        contentDescription = "Perfil"
                     )
                 }
             }
@@ -209,15 +207,9 @@ fun Home(navegacao: NavHostController?) {
                     .padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Button(onClick = { carregarCategorias() }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0025DA), contentColor = Color.White)) {
-                    Text("Categoria")
-                }
-                Button(onClick = { carregarEstados() }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0025DA), contentColor = Color.White)) {
-                    Text("Estado")
-                }
-                Button(onClick = { navegacao?.navigate("criar_evento") }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0025DA), contentColor = Color.White)) {
-                    Text("Criar Evento")
-                }
+                Button(onClick = { carregarCategorias() }) { Text("Categoria") }
+                Button(onClick = { carregarEstados() }) { Text("Estado") }
+                Button(onClick = { navegacao?.navigate("criar_evento") }) { Text("Criar Evento") }
             }
 
             Text(
@@ -248,8 +240,6 @@ fun Home(navegacao: NavHostController?) {
     }
 
     if (showEstadoDialog) {
-        Log.d("DEBUG", "Estados disponíveis: ${estados.map { it.estado }}")
-
         MultiSelectDialog(
             titulo = "Estados",
             opcoes = estados.map { it.estado },
@@ -262,10 +252,4 @@ fun Home(navegacao: NavHostController?) {
             onDismiss = { showEstadoDialog = false }
         )
     }
-}
-
-@Preview(showSystemUi = true)
-@Composable
-fun HomePreview() {
-    Home(null)
 }
