@@ -143,8 +143,10 @@ fun Login(navegacao: NavHostController?) {
                                             if (usuarioEncontrado != null) {
                                                 erro.value = "Login realizado com sucesso"
                                                 SharedPrefHelper.salvarEmail(context, usuarioEncontrado.email)
+                                                SharedPrefHelper.salvarIdUsuario(context, usuarioEncontrado.id_usuario) // <-- ESSA LINHA
                                                 navegacao?.navigate("home")
-                                            } else {
+                                            }
+                                            else {
                                                 erro.value = "Email ou senha incorretos"
                                             }
                                         } else {

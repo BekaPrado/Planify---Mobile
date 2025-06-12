@@ -66,7 +66,11 @@ fun EventoCard(evento: Evento, onClick: () -> Unit = {}) {
         ),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Column {
+        Column (
+            modifier = Modifier
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween
+        ){
             AsyncImage(
                 model = evento.imagem,
                 contentDescription = evento.titulo,
@@ -81,14 +85,14 @@ fun EventoCard(evento: Evento, onClick: () -> Unit = {}) {
                 Text(evento.descricao, fontSize = 14.sp, maxLines = 2)
                 Spacer(Modifier.height(8.dp))
                 Text("Local: ${evento.local}", fontSize = 12.sp)
-                Text("Estado: ${evento.estado.estado}", fontSize = 12.sp)
+                Text("Estado: ${evento.id_estado}", fontSize = 12.sp)
                 Text(
-                    text = "Categorias: ${evento.categoria.joinToString { it.categoria }}",
+                    text = "Categorias: ${evento.id_categoria}",
                     fontSize = 12.sp
                 )
                 Text("Data: ${formatarData(evento.data_evento)} às ${formatarHora(evento.horario)}", fontSize = 12.sp)
 
-                val valor = evento.valor_ingresso.toDoubleOrNull()
+                val valor = evento.valor_ingresso
                 Text(
                     text = if (valor != null) "Valor: R$ %.2f".format(valor) else "Valor: R$ --",
                     fontSize = 12.sp

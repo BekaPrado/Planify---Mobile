@@ -31,6 +31,7 @@ import com.example.planifyeventos.model.*
 import com.example.planifyeventos.screens.components.EventoCard
 import com.example.planifyeventos.screens.components.MultiSelectDialog
 import com.example.planifyeventos.service.RetrofitFactory
+import com.example.planifyeventos.model.Categoria
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -60,12 +61,15 @@ fun Home(navegacao: NavHostController?) {
     fun aplicarFiltro() {
         eventosFiltrados.value = eventosState.value.filter { evento ->
             val pesquisaOk = textoPesquisa.isBlank() || evento.titulo.contains(textoPesquisa, ignoreCase = true)
-            val categoriaOk = categoriasSelecionadas.isEmpty() || evento.categoria.any { cat ->
-                categoriasSelecionadas.any { filtro -> filtro.equals(cat.categoria, ignoreCase = true) }
-            }
-            val estadoOk = estadosSelecionados.isEmpty() || estadosSelecionados.any {
-                it.equals(evento.estado.estado, ignoreCase = true)
-            }
+
+            // Corrigido: evento.categoria é String, não precisa de .any()
+            val categoriaOk = categoriasSelecionadas.isEmpty() ||
+                    categoriasSelecionadas.any { it.equals(evento.id_categoria, ignoreCase = true) }
+
+            // Corrigido: evento.estado é String direta
+            val estadoOk = estadosSelecionados.isEmpty() ||
+                    estadosSelecionados.any { it.equals(evento.id_estado, ignoreCase = true) }
+
             pesquisaOk && categoriaOk && estadoOk
         }
     }
