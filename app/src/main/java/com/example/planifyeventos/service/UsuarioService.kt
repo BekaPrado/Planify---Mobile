@@ -20,7 +20,6 @@ interface UsuarioService {
     @PUT("usuario/{id}")
     fun atualizarUsuarioPorId(@Path("id") id: Int): Call<Usuario>
 
-    // ✅ Nova função para redefinir senha
     @PUT("usuario/senha/{id}")
     fun redefinirSenhaRaw(
         @Path("id") id: Int,

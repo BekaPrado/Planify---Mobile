@@ -86,9 +86,16 @@ fun MultiSelectDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    TextButton(onClick = onDismiss) {
-                        Text("Cancelar", color = branco)
+                    TextButton(
+                        onClick = onDismiss,
+                        colors = ButtonDefaults.textButtonColors(
+                            containerColor = fundoAzul,
+                            contentColor = branco
+                        )
+                    ) {
+                        Text("Cancelar")
                     }
+
                     Spacer(modifier = Modifier.width(8.dp))
                     TextButton(onClick = { onConfirmar(selecionadosState.toList()) }) {
                         Text("Filtrar", color = branco)

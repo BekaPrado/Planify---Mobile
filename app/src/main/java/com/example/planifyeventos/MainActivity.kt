@@ -14,6 +14,8 @@ import com.example.planifyeventos.screens.Login
 import com.example.planifyeventos.screens.Perfil
 import com.example.planifyeventos.screens.RecuperarSenha
 import com.example.planifyeventos.screens.RedefinirSenhaScreen
+import com.example.planifyeventos.screens.EventosCriados
+import com.example.planifyeventos.screens.Ingressos
 import com.example.planifyeventos.screens.VerificarCodigo
 import com.example.planifyeventos.utils.SharedPrefHelper
 
@@ -40,6 +42,8 @@ class MainActivity : ComponentActivity() {
                 composable(route = "home") { Home(navegacao) }
                 composable(route = "perfil") { Perfil(navegacao) }
                 composable(route = "recuperar_senha") { RecuperarSenha(navegacao) }
+                composable("eventos_criados") { EventosCriados(navegacao) }
+                composable("ingressos") { Ingressos(navegacao) }
 
 
                 composable(route = "verificar_codigo/{email}") { backStackEntry ->

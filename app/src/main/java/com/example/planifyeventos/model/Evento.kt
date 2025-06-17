@@ -13,5 +13,5 @@ data class Evento(
     val id_estado: String,
     val id_categoria: String,
     val id_usuario: Int,
-    val participante: List<Usuario>
+    val participante: List<Usuario>? = emptyList()
 )
